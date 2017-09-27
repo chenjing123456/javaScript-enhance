@@ -1,0 +1,236 @@
+1. Node简介
+	Node也叫NodeJS，Node.js，由Ryan-Dahl于2009年5月在GitHub发布了第一版。
+        ****Node是一个JavaScript运行环境(runtime)，用来解析js；也是库。实际上它是对Google V8引擎里的js解析器进行了封装。
+	和浏览器有的一比；前期学习的js运行在浏览器，后期js运行在node环境中，都是js的运行环境，对js进行解析。
+	官网(http://www.nodejs.org) 是这样介绍Node的：一个搭建在ChromeJavaScript运行时上的平台，用于构建高速、可伸缩的网络程序。
+	Node采用的事件驱动、非阻塞I/O模型，使它既轻量又高效，并成为构建运行在分布式设备上的数据密集型实时程序的完美选择。
+    API: https://nodejs.org/dist/latest-v6.x/docs/api/
+	1) Node业务特点
+		1) Node对一些特殊用例进行了优化，提供了替代的API，使得V8在【非浏览器环境下】运行得更好。
+		2) Node不处理UI，但用与浏览器相同的机制和原理运行，打破了过去JavaScript只能在浏览器中运行的局面。
+		3) 前后端编程环境统一，可以大大降低前后端转换所需要的上下文交换代价。
+		4) Node是一个基于Chrome JavaScript运行时建立的平台，用于方便地搭建响应速度快、易于扩展的网络应用。
+		5) NodeJs 使用事件驱动，非阻塞I/O 模型而得以轻量和高效，非常适合在分布式设备上运行数据密集型的实时应用。
+	2) Node技术特点
+		1) 异步I/O，可以像异步请求一样异步读写文件进行I/O操作
+		2) 事件与回调函数
+		3) 单线程
+			优点： 无序在意状态的同步问题，没有死锁概念，也没有线程上下文交换所带来的性能上的开销
+			缺点： 无法利用多核CPU；错误会引起整个应用退出；大量计算会占用CPU导致无法继续异步调用I/O	
+			Node采用了与Web Workers相同的思路来解决单线程中大量计算的问题，child_process。子线程的出现，意味着Node可以从容地应对单线程在健壮性和无法利用多核CPU方面的问题。将计算分发到各个子线程，可以将大量计算分解掉，然后再通过线程之间的事件消息来传递结果。通过Master-Worker的管理方式，也可以很好地管理各个工作进程。
+		4) 跨平台
+			可以运行在windows，linux,unix等平台
+2.下载、安装
+	进入官网https://nodejs.org/en/ ，选取合适的版本进行下载
+	安装：
+		linux
+			先将安装包解压,然后进行环境变量的配置即可
+		window
+			双击node安装
+3. Hello world
+	1) JS文件创建
+		新建一个JS文件index.js
+	2) JS文件编写
+		在index.js中编写console.log("hello world");
+	3) JS文件执行 
+		node [要执行文件所在的路径]
+			node index.js
+		或者
+			node index
+4.Node基本使用
+	1)执行js脚本
+		使用node可以直接执行js脚本，如上3.Hello world所示
+	2)REPL环境
+		在命令行键入node命令，后面没有文件名，就进入一个Node.js的REPL环境（Read–eval–print loop，”读取-求值-输出”循环），可以直接运行各种JavaScript命令。
+		$ node 
+		>1+1 
+		2
+		>
+5. 模块化结构
+	Node.js采用模块化结构，按照CommonJS规范定义和使用模块。
+	在Node中，以模块为单位划分所有功能，并且提供一个完整的模块加载机制，使得我们可以将应用程序划分为各个不同的部分，并且对这些部分进行很好的协同管理。
+	通过将各种可重用的代码编写在各种模块中的方法，我们可以大大减少应用程序的代码量，提高应用程序开发效率以及应用程序的可读性。通过模块加载机制，我们也可以将各种第三方模块引入到我们的应用程序中。
+
+	1) CommonJS
+		JavaScript是一种功能强大的面向对象语言，具有一些最快速的动态语言解释器。官方JavaScript规范定义了一些用于构建基于浏览器的应用程序的对象的api。但是，规范并没有定义一个用于对于构建更广泛的应用程序的标准库。CommonJS API将通过定义处理许多常见应用程序需求的API来填补这一空白，最终提供与Python、Ruby和Java一样丰富的标准库。其意图是应用程序开发人员能够使用CommonJS API编写应用程序，然后在不同的JavaScript解释器和主机环境中运行该应用程序。在兼容CommonJS的系统中，你可以使用 JavaScript程序开发：
+			* 服务器端JavaScript应用程序
+			* 命令行工具
+			* 图形界面应用程序
+			* 混合应用程序（如，Titanium或Adobe AIR）
+			* Node应用由模块组成，采用CommonJS模块规范。
+
+	2) 模块作用域
+		每个文件就是一个模块，有自己的作用域。在一个文件里面定义的变量、函数、类，都是私有的，对其他文件不可见
+			1）私有属性
+				var x = 5;
+				var addX = function(){ return value+x;};
+				上面代码中，变量x和函数addX，是当前文件example.js私有的，其他文件不可见。在其他文件调用会报错
+			2) 全局属性
+				如果想在多个文件分享变量，必须定义为global对象的属性。或者也可以使用export暴露出去
+					global.warning = true; 
+					或者
+					module.exports.waining = waining;
+					在外面使用时必须引用该模块并且通过定义的模块变量调用.
+	3)模块交互
+		*如果模块为文件夹，那么会默认找模块里的index.js文件(启动文件)；如果没有则会报错。所以文件夹作为模块必须要有个启动文件。
+			*module1文件夹下有一个index.js文件，node module1;那么默认会加载index.js文件，即使文件没有暴露，也可以被当做模块解析。但如果不为或者没有index.js那么会报错，因为没有启动文件。
+			*module1和module2分别有一个index.js,和他们同一级别的有一个main.js;要在main.js文件中引入module1和module2模块
+				main.js
+				 var module1= require('./module1');     module1.sayhi();
+				 var module2=require('./module2');      module2.sayhello();
+		*CommonJS规范规定，每个模块内部，module变量代表当前模块。这个变量是一个对象，它的exports属性（即module.exports）是对外的接口。加载某个模块，其实是加载该模块的module.exports属性。
+		1.自定义模块
+			var x = 5; 
+			var addX = function (value) { return value + x; }; 
+			/*
+			module.exports.x = x;
+			module.exports.addX = addX; 
+			*/
+			或者可以直接变成
+			module.exports = {
+				x:x,
+				addX:addX			
+			}
+		2.模块加载
+			require方法用于加载模块。参数有两种：可以为具体路径；也可以把所有的模块都放到node_modules里面，然后在引用时直接为node-modules里面各个模块即可，不用加./路径。
+			
+			×参数为具体路径：(具体路径必须准确的找到，不能放在其他地方)
+				var example = require('./example.js'); 
+				console.log(example.x); // 5 
+				console.log(example.addX(1)); // 6 
+			×参数为文件名（模块名）
+				那么会沿着如下路线寻找
+					系统模块					
+					当前node_modules,
+					上一级node_modules
+					上上一级node_modules
+					...
+		*CommonJS特点：
+			1)所有代码都运行在模块作用域，不会污染全局作用域。
+			2)模块可以多次加载，但是只会在第一次加载时运行一次，然后运行结果就被缓存了，以后再加载，就直接读取缓存结果。要想让模块再次运行，必须清除缓存。
+			3)模块加载的顺序，按照其在代码中出现的顺序。
+	4) 模块对象
+		通过module对象可以获取模块的基本信息并且可以定义模块向其他模块暴露的函数或属性。在模块文件内部，可以访问当前模块的一些属性
+		module.id 	
+			模块id,默认情况下，主模块ID属性值为".",其他模块的ID属性值为该模块文件的绝对路径。
+		module.filename
+			当前模块文件的文件名（路径+文件名）
+		module.loaded
+			布尔类型值，表示模块是否加载完毕
+		module.parent
+			当前模块的父模块对象，即调用当前模块的模块对象
+		module.children
+			数组，存放了当前模块的所有子模块对象。
+		module.paths
+			加载路径，默认的在当前的node_modules中找，找不到则往上一级的node_modules中找，如此往复。
+			比如paths: 
+				   [ '/home/briup/WebUI/Node/day01/exercise/part1/module2/node_modules',
+				     '/home/briup/WebUI/Node/day01/exercise/part1/node_modules',
+				     '/home/briup/WebUI/Node/day01/exercise/node_modules',
+				     '/home/briup/WebUI/Node/day01/node_modules',
+				     '/home/briup/WebUI/Node/node_modules',
+				     '/home/briup/WebUI/node_modules',
+				     '/home/briup/node_modules',
+				     '/home/node_modules',
+				     '/node_modules' ] 
+
+		module.exports
+			**该对象的作用是用来添加模块向模块调用者暴露的属性和方法
+		 exports变量
+		为了方便，Node为每个模块提供一个exports变量，指向module.exports。这等同在每个模块头部，有一行这样的命令。
+		var exports = module.exports; 
+
+5.内部核心模块（内部有的，可以直接引用）   自定义模块不要与内置的模块重名
+	
+	1.path模块
+		path 模块提供了一些工具函数，用于处理文件与目录的路径，使用如下方法引用：
+		var path = require('path');
+
+		path.basename()	该方法返回一个参数路径的最后一部分
+		path.dirname() 		该方法返回一个参数路径的目录名
+		path.extname() 	该方法返回参数路径最后一部分的扩展名，即从 path 的最后一部分中的最后一个 .（句号）字符到字符串结束。
+		path.isAbsolute() 	该方法会判定 path 是否为一个绝对路径。
+		path.join() 		该方法使用平台特定的分隔符把全部给定的 path 片段连接到一起，并规范化生成的路径
+			【注】Linux/Unix系统是”/“，Windows系统是”\“。
+		path.normalize() 	该方法会规范化给定的 path，并解析 '..' 和 '.' 片段
+			
+		path.delimiter		该属性提供平台特定的路径分隔符
+		另外：
+		__filename：指向当前运行的脚本文件名。和module.filename获取的结果是一样的。
+		__dirname：指向当前运行的脚本所在的目录。指的是module.filename中的目录名.
+
+	
+	2.querystring模块(用于查询字符串)
+		querystring 模块提供了一些实用函数，用于解析与格式化 URL 查询字符串。使用如下方法引用
+		查询字符串：user=user&pwd=pad
+		var querystring = require('querystring');
+
+		querystring.stringify(obj[, sep[, eq]])	将对象转换为查询字符串
+			obj  要序列化成 URL 查询字符串的对象。 
+			sep 用于界定查询字符串中的键值对的子字符串。默认为 '&'。 
+			eq   用于界定查询字符串中的键与值的子字符串。默认为 '='。
+		
+		querystring.parse(str[, sep[, eq]])	将查询字符串转换为对象
+	
+	3.url模块
+		querystring模块提供了一些实用函数，用于 URL 处理与解析。 可以通过以下方式使用
+		
+		var url = require('url');
+		
+	 ***url.parse() 	将一个url地址转换为一个对象
+	 		该对象有属性pathname和query
+	 			pathname: /course
+	 			query : name=terry&id=12 (查询字符串)
+	 			
+		url.resolve() 	该方法会以一种 Web 浏览器解析超链接的方式把一个目标 URL 解析成相对于一个基础 URL
+		url.resolve('/one/two/three', 'four'); 
+			 '/one/two/four' 	
+		url.resolve('http://example.com/', '/one');
+			'http://example.com/one'
+		url.resolve('http://example.com/one', '/two');			
+			'http://example.com/two'
+
+
+		例子：
+		//导入url,querystring模块
+		var querystring = require('querystring');
+		var url = require('url');
+		
+		//模拟数据url
+		var qs ='http://localhost:8080/user?name=za&pwd=123';
+		
+		//将字符串请求地址转换为url对象
+		var urlObj = url.parse(qs);
+
+		console.log(urlObj);//一个对象，里面有一个query属性是查询字符串
+		
+		//获取url对象中的查询字符串name=terry$age=12
+		var query = urlObj.query;
+		console.log(query);
+
+
+		//将查询字符串转换为对象
+		console.log(querystring.parse(query));
+
+		//将对象转换为查询字符串name=terry$age=12
+		var obj={
+		        name:'terry',
+		        age:12
+		}
+		console.log(querystring.stringify(obj));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,140 @@
+1. 服务器编程(http模块) 前端和后台交互
+
+    var http = require('http');
+    var server = http.createServer(function(req,resp){
+        req.url
+        req.method
+        req.headers
+
+        //１.获取用户的请求路径 
+        url.parse(req.url).pathname
+        url.parse(req.url).query
+        //２.获取请求参数
+        querystring.parse(url.parse(req.url).query);
+
+        var chunk = new Buffer(0);
+        req.on('data',function(data){
+            chunk += data;
+        });
+        req.on('end',function(){
+            console.log(chunk.toString());
+        });
+        //如果涉及到文件上传功能，fs模块
+
+        resp.writeHead(200,'ok',{
+            'Content-Type':'text/plain;charset=utf-8'
+        });
+        //fs.readFile('/home/licy/index.ht');
+        resp.write("");
+        resp.end();
+
+        状态码  200 ok
+                404 not found
+                500 后台代码异常
+                403　拒绝访问（跨域，无权限）
+    });
+    server.listen(8080,function(){
+        console.log("服务启动成功");
+    });
+
+fs模块:文件的上传
+
+2.后台与数据库交互
+    三种方法：
+    1）连接对象：connection
+            1.createConnection()创建连接对象
+            2.connection.connect()连接数据库
+            3.对数据库进行操作:connection.query(sql,function(err,results,fields){})
+            4.关闭数据库connection.end();
+
+            `
+            var mysql = require('mysql');
+            //console.log(mysql);
+
+            //创建数据库连接对象
+            var connection = mysql.createConnection({
+                host:'192.168.137.10',
+                port:'3306',
+                user:'root',
+                password:'root',
+                database:'web1702'
+            });
+            //console.log(connection);
+            //连接数据库
+            connection.connect();
+            //查询数据，对数据库进行操作等
+            var sql = 'select * from xk_student';
+            connection.query(sql,function(err,results,fields){
+                console.log('回调');
+                if(err){
+                    throw err;
+                }else{
+                    console.log(results);
+                }
+                //关闭数据库
+                connection.end();
+            });
+            console.log('..end...');
+
+            `
+    2）连接池:pool
+            1.创建连接池
+            2.获取连接对象
+            3.对数据库进行操作
+            4.释放连接对象到连接池
+            5.关闭连接池
+           
+            `
+            var mysql = require('mysql');
+            //创建连接池
+            var pool = mysql.createPool({
+                host:'192.168.137.10',
+                port:'3306',
+                database:'web1702',
+                user:'root',
+                password:'root'
+            });
+
+            //获取连接
+            pool.getConnection(function(err,connection){
+                if(err){
+                    throw err;
+                } else {
+                    //数据库操作
+                    var sql = 'select * from xk_course';
+                    connection.query(sql,function(err,results){
+                        if(err){
+                            throw err;
+                        } else {
+                            console.log(results);
+                        }
+                    });
+                    //释放连接对象到连接池中，供下次使用
+                    connection.release();
+                    //关闭连接池，释放连接池中所有连接
+                    pool.end();
+                }
+            });
+
+
+
+            `
+    3）只创建一个连接池:pool
+            1.创建连接池
+            2.把连接池变为全局变量
+            3.在任意模块都可使用此连接池
+
+            `
+            var mysql = require('mysql');
+
+            var pool = mysql.createPool({
+                        host:'127.0.0.1',
+                        port:'3306',
+                        database:'web1702',
+                        user:'root',
+                        password:'root'
+                    });
+
+            global.pool = pool;
+
+            `

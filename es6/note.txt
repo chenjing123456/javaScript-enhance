@@ -1,0 +1,66 @@
+#es6.(ECMAscript2015)
+
+1.babel工具
+	(1)方式一
+		步骤：
+			1．全局安装babel-cli      npm install babel-cli -g
+			2.本地安装babel预设（转换规则）　　npm install babel-preset-latest
+			3.编写配置信息 把.babelrc放置在根目录
+				{
+					"presets":["latest"]			
+				}
+			4.使用babel进行转码(只能转码新语法，无法转换新功能)
+				mkdir src ;  创建src文件夹
+			 	vim src/hello.js ;   在src中编写es6代码
+				babel  src --out-dir dist;  使用babel转码（把src下的文件进行转码并把转码后的文件都放到dist下）
+				node dist/hello.js　　运行转码后的文件
+		缺点：依赖环境babel,假设别人没有安装babel工具,就运行不了
+	(2)方式二(实际开发所需)
+		步骤：
+			1.在项目根目录运行  npm init -y 
+			2.本地安装babel-cli    npm install babel-cli -g --save-dev
+			  本地安装babel-preset-latest    npm install babel-preset-latest -g --save-dev
+			3.添加配置信息(根目录.babelrc)
+				{"presets":["latest"]}
+			4.在package.json添加脚本build
+				"script":{
+					"build":"babel src --out-dir dist"		
+				}
+			5.执行转换　	npm run build运行脚本
+				mkdir src 
+				vim src/hello.js
+				npm run build 
+				node dist/hello.js
+
+	(3)垫片babel-polyfill，用来转换es6新功能的
+		npm install --save babel-polyfill(本地安装)
+		require('babel-polyfill');引入模块即可
+2.let和const命令
+	(1)let:
+		有块级作用域
+		不存在变量提升
+		不能重复声明
+		存在暂时性死区
+	(2)const:
+		有let命令的所有特点
+		并且有另外两个特点：
+			必须在声明时赋值（不初始化转码不通过）
+			不能二次赋值:如果的基本数据类型则数值不能改变，如果是引用数据类型，引用地址不能改变
+
+3.解构
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

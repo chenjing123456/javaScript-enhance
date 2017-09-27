@@ -1,0 +1,588 @@
+#es6.(ECMAscript2015)
+
+(一)
+1.babel工具
+	(1)方式一
+		步骤：
+			1．全局安装babel-cli      npm install babel-cli -g
+			2.本地安装babel预设（转换规则）　　npm install babel-preset-latest
+			3.编写配置信息 把.babelrc放置在根目录
+				{
+					"presets":["latest"]			
+				}
+			4.使用babel进行转码(只能转码新语法，无法转换新功能)
+				mkdir src ;  创建src文件夹
+			 	vim src/hello.js ;   在src中编写es6代码
+				babel  src --out-dir dist;  使用babel转码（把src下的文件进行转码并把转码后的文件都放到dist下）
+				node dist/hello.js　　运行转码后的文件
+		缺点：依赖环境babel,假设别人没有安装babel工具,就运行不了
+	(2)方式二(实际开发所需)
+		步骤：
+			1.在项目根目录运行  npm init -y 
+			2.本地安装babel-cli    npm install babel-cli -g --save-dev
+			  本地安装babel-preset-latest    npm install babel-preset-latest -g --save-dev
+			3.添加配置信息(根目录.babelrc)
+				{"presets":["latest"]}
+			4.在package.json添加脚本build
+				"script":{
+					"build":"babel src --out-dir dist"		
+				}
+			5.执行转换　	npm run build运行脚本
+				mkdir src 
+				vim src/hello.js
+				npm run build 
+				node dist/hello.js
+
+	(3)垫片babel-polyfill，用来转换es6新功能的
+		npm install --save babel-polyfill(本地安装)
+		require('babel-polyfill');引入模块即可
+2.let和const命令
+	(1)let:声明变量
+		有块级作用域
+		不存在变量提升
+		不能重复声明
+		存在暂时性死区
+			当用let声明常量也是可以的，并且可以二次赋值
+			let经常用于for循环中，只在循环体内有效；而用var声明的变量是全局变量（只有一个），不管多少次循环i值永远为最后一个
+	(2)const:声明常量
+		有let命令的所有特点
+		并且有另外两个特点：
+			必须在声明时赋值（不初始化转码不通过）
+			不能二次赋值:如果的基本数据类型则数值不能改变，如果是引用数据类型，引用地址不能改变
+
+3.解构：原来一个表达式只能对一个变量赋值，通过解构可以让一个表达式为多个变量赋值。
+	ES6 允许按照一定模式，从数组和对象中提取值，对变量进行赋值，这被称为解构
+	（１）数组解构:
+		1.数组是有序的，它可以从数组中提取值，按照对应位置，对变量赋值。
+			let [a, b, c] = [1, 2, 3];
+			这种写法属于“模式匹配”，只要等号两边的模式相同，左边的变量就会被赋予对应的值。
+
+			let [ , , third] = ["foo", "bar", "baz"];  //third ->'baz'
+			let [x, y, ...z] = ['a'];   //'a' undefined []
+			当没有填或者为undefined时，则的变量值为undefined
+			
+		2.数组的默认值
+	（２）对象解构:
+
+
+
+
+
+
+(二)扩展
+1. 对象扩展
+    1) 对象简写方式
+        let name = "terry";
+        let age = 12;
+
+        var person = {
+            name,
+            age,
+            sayName(){
+
+            }
+            ['first'+'name']:'simis'
+        }
+    2) 实例函数属性
+        person.sayName.name     //sayName
+    3) API扩展
+        Object.is(val1,val2)
+            类似与===,但是由两个特殊的地方
+                NaN NaN     true
+                +0  -0      false
+
+        Object.assign(target,o1,o2)
+            将o1,o2中的自有属性的合并到target中，并且返回target的引用
+            var o = {};
+            var result = Object.assign(o);
+            result === o;   //true  
+
+        Object.setPrototypeOf(obj,prototype);
+            直接改变obj的__proto__属性，其目的是让obj可以调用prototype中的方法
+
+        Object.getPrototypeOf(obj);
+            获取obj的__proto__属性的值
+	
+	Object的三个遍历方法和数组不一样，它返回数组，而数组的三个同名遍历方法返回迭代器：
+		Object.keys(obj)　返回数组
+		    获取指定对象中所有的属性名
+		    [key1,key2,key3]
+
+		Object.values(obj)　返回数组
+		    获取指定对象中所有的属性值
+		    [val1,val2,val3]
+
+		Object.entries(obj)　返回数组
+		    获取指定对象中所有键值对数组
+		    [[key1,val1],[key2,val2]]
+
+
+2. 函数扩展
+    1) 函数参数扩展
+        1. 函数参数默认值
+            $.ajax("student/findAll",{
+                //默认行为
+                
+                success:function(){
+
+                }
+            });
+            //方案１
+            function ajax(url,options){
+                var DEFAULT = {
+                    method:'GET',
+                    dataType:'json',
+                    contentType:'',
+                    async:true,
+                }
+                options = Object.assign({},DEFAULT,options);
+            }
+            //方案２　给默认值
+            function ajax(url,{
+                method='get'
+                ,dataType='json'}){
+
+            }
+
+            function test(a,b=0){
+                return a+b;
+            }
+            test(1);
+            test.length //期待获取参数的个数，形式参数的个数，1
+
+        2. rest参数（可变参数类型 数量）
+            function test(a,b,...c){
+
+            }
+            test(1,2,3,4,5,6,7,8);
+
+
+            function test2(a,b,c){
+
+            }
+            var param = [1,2,3];
+            test2(...param);//实际上是简化了test2.apply(this,param)
+
+            Math.max(...[1,2,3,4]);
+
+    2) 箭头函数（实例化函数的方式改变）
+        v => v
+        －－－
+        function(v){
+            return v;
+        }
+
+        (v) => {}
+        －－－
+        function(v){
+
+        }
+
+        (v,s) =>{
+            var result = v+s;
+            return result;
+        }
+        －－－
+        function(v,s){
+            var result = v+s;
+            return result;
+        }
+
+        箭头左侧为参数列表，如果参数个数为一个，可以不加括号
+        箭头右侧为函数体，如果不加大括号，直接将箭头后的值返回
+        如果加上大括号，可以在大括号中写多条语句，但是需要手动返回结果
+    
+    3) this取值
+        this值与调用方式有关,但是在箭头函数中this的取值为undefined
+        function test(){
+            console.log(this);
+        }
+        var obj = {
+            test:test
+        }
+
+        test(); //window
+        obj.test(); //obj
+        test.call(obj); //obj
+3. 数组的扩展
+    1) 扩展运算符    
+        ...　是rest参数的逆运算
+        Math.max(...[1,2,3,4]);
+        =>
+        Math.max.apply(this,[1,2,3,4])
+
+        将字符串转换为数组
+            var arr = [...'hello world'];
+
+    2) Array API的扩展(Array)
+        1. Array.from(param)
+        将param转换为数组
+        param的取值：
+            1. 类数组对象
+            2. 部署了iterator方法的对象
+                set,map,string,array...
+
+        2. Array.of(param);
+        将param转化为数组
+            new Array(4);
+            new Array(true);
+            new Array(4,5)
+            new Array(4.5);
+
+    3) Array实例的API的扩展(Array.prototype)
+        var arr = [1,2,3];
+        arr.xxx
+
+        1. arr.find((item,index,arr)=>{
+                回调函数返回值为boolean
+            });
+           find方法的返回值为遍历过程中回调函数第一个返回true的元素。
+        2. arr.findIndex((item,index,arr)=>{
+                回调函数返回值为boolean
+            });
+            find方法的返回值为遍历过程中回调函数第一个返回true的元素的索引。
+        3. arr.fill(param,beginIndex,endIndex);
+            从beginIndex位置开始填充直到endIndex,但是不包含endIndex,填充的值为第一个参数
+            如果没有指定beginIndex,endIndex,将默认填充整个数组。
+
+
+        4. arr.keys()
+        5. arr.values() //在node 8.4.0中不支持，需要添加垫片
+        6. arr.entries()
+            以上三方方法均返回一个迭代器对象，使用next方法能获取下一个值
+            for(let a of arr.keys()){
+
+            }
+                具有iterator接口
+        7. arr.includes(v)
+            判断v是否包含在arr中，比较使用Object.is()
+        
+
+(三)
+1.Set：无序的不可以重复的集合对象，不能通过索引获取，包含的是值的集合
+	１．实例化set对象
+	２．属性：set.size
+	３．方法
+	４．应用
+2.Map：键值成对的集合对象,
+	key值不能重复；key值重复时后者会覆盖前者
+	１．实例化对象
+	２．属性
+	３．方法
+
+3.Promise：简单说就是一个容器，里面保存着某个未来才会结束的事件（通常是一个异步操作）的结果。
+	从语法上说，Promise 是一个对象，从它可以获取异步操作的消息。
+
+	１．Promise：承诺，异步操作(构造函数)
+
+	   (1) var promise = new Promise(function(resolve,reject){
+		//未完成状态
+		console.log("承诺开始，未完成");
+		//进行一系列异步操作
+		//异步操作结束之后再调用resolve或者reject预示着承诺的结束
+			resolve();/reject()
+	    });
+		
+	
+	2.定义在原型对象中的方法，实例调用　(then,catch)
+	    (1)promise.then(function(data){},function(){}); 
+		第一个参数表示处理为resolve的操作函数，第二个参数表示处理结果为reject的操作函数；一般第二个不用，通常通过catch方法实现失败的处理函数
+		
+		也可以使用两个then，前面一个then的返回值会作为第二个then的参数。
+			ｅｇ:
+			var promise = getJSON('http://localhost:3000/student/findAll');
+			promise.then(function(data){
+				console.log(data);
+				return data[0];
+			}).then(function(data1){//此时data[0]将作为参数传递给data1
+				console.log(data1);
+			})
+
+	    (2)promise.catch(function(){
+	       // 当promise状态为rejected时候执行该回调函数
+	    	});
+	    	＝》是promise.then(null,rejection)的别名，用于指定发生错误时的回调函数，一般不使用then方法的第二个参数定义reject回调函数，而是用catch.
+	
+
+	3.定义在构造函数中的方法
+	    (1)var p = Promise.all([p1,p2,p3]).参数是一个由多个承诺组成的数组
+
+		当p1,p2,p3状态都改变为resolved的时候，p的状态才是resolved，返回的结果是三个对象成功函数的结果组成的数组
+		p.then(function(data){
+		    //data 是p1,p2,p3的结果组成的数组
+		})
+
+		当p1,p2,p3中有一个状态改变为rejected的时候，p的状态就为rejected
+
+	    (2) var p = Promise.race([p1,p2,p3])
+		p的状态由p1,p2,p3中率先改变状态的promise决定
+		p.then(function(data){
+		    data为率先改变状态的promise的结果(其中一个promise为resolve的结果)
+		}).catch(function(err){console.log(err)});
+		规则是谁先把状态报给promise,那么整个p的状态就为先报的那个promise的状态
+			假如p1状态为err,p2,p3状态为ｓｏｌｖｅ;如果p1先报状态给p,则p的状态为p1 err;如果p2先报状态给p,则p的状态为p2;如果p3先报状态给p,则p的状态为p3;p的状态由先报的决定
+
+	    (3)var p = Promise.resolve(val);
+		将val(任意)转换为promise对象，并且状态resolved；异步编程，只有在结束外层所有循环时，才会执行resolve,reject中的then，catch。
+	    (4)var p = Promise.reject(val)
+		将val转换为promise对象，并且状态rejected；异步编程，只有在结束外层所有循环时，才会执行resolve,reject中的then，catch。
+
+	    (5)promise.finally(function(){
+		//不管promise的状态如何，该回调函数都会执行
+	    });
+
+
+	2.应用：对ajax请求的封装
+		（１）未使用promise实现的ajax封装
+		function getJSON(url,hander){
+			let request = new XMLHttpRequest();
+			request.open('GET',url,true);
+			request.responseType = 'json';
+			//request.setRequestHeader('Accept','application/json')
+			//request.setRequestHeader('Content-Type',"application/json;charset=utf-8")
+			request.send();
+			request.onreadystatechange = function(){
+				if(request.readyState == 4){
+					if(request.status == 200){
+						console.log(request);
+					} else {
+						throw new Error(request.status);
+					}
+				}
+			}
+		}
+		//1.未经过promise封装之前的ajax,使用的是回调函数方式调用
+		getJSON('http://localhost:3000/student/findAll',function(){});
+		（２）使用promise对ajax请求的封装
+		function getJSON(url){
+			//返回一个承诺对象，
+			return new Promise((resolve,reject)=>{
+				//承诺状态未实现
+				let request = new XMLHttpRequest();
+				request.open('GET',url,true);
+				request.responseType = 'json';
+				//request.setRequestHeader('Accept','application/json')
+				//request.setRequestHeader('Content-Type',"application/json;charset=utf-8")
+				request.send();
+				request.onreadystatechange = function(){
+					if(request.readyState == 4){
+						if(request.status == 200){
+						//承诺实现时的回调
+							resolve(request.response);
+						} else {
+						//承诺失败时的回调
+							reject(request.status);
+						}
+					}
+			}
+			});
+		}
+	
+
+		在html页面　使用的是用promise对象进行封装的，通过then 来实现成功和失败函数处理
+
+		var promise = getJSON('http://localhost:3000/student/findAll');
+		promise.then(function(data){
+			console.log(data);
+		},function(err){
+			console.log(err);
+		})
+
+4.模块化
+	1.（node模块化，commonJS）
+	    模块定义
+		npm init -y
+		module1.js
+		module2
+		    index.js
+		模块内部对象
+		    module
+
+		    暴露模块内部的属性和方法
+		    module.exports
+	    模块的引用
+		require(v);
+		    v　为模块所在路径
+		        ./module1.js
+		        ./module2   
+		    v 为模块名
+		        mysql
+		            node_modules...
+	2.模块化（es6模块化）
+
+
+	    1. 定义模块
+
+		一：export 不能直接跟一个值 （在同一个module中可以出现多次，即使多次它暴露出去的依然的同一个对象，并且每import一次，就作为这个对象的属性被暴露出去）
+		比如：let name = 'larry',export name;  export {name:'larry',age:12} 这样会出问题
+		可以通过下面两种方法实现：
+		（１）加声明的关键字
+			export let person = {name:'terry'}
+			export var a  = 3 ;
+
+		（２）加一个{},使它不会被解析
+			let a = 3;
+			let b = 4;
+			let c ={name:'larry',age:12}
+			export {a}
+			export {b}
+			export {c}
+			或者//export {a,b}
+		   通过export导出模块对象，不管export几次，都返回同一个对象，这个导出的对象包括a,b两个属性；
+			而引入模块的时候　导入的是暴露的模块对象，即引入的是一个对象（包括暴露内的属性）可以通过对象解构实现导入
+
+		
+		二：默认export 可以直接跟一个值　(在同一个module中只能出现一次)；为模块指定默认输出，一般情况下用export default暴露的必须是匿名变量或者匿名函数。其他模块加载该模块时可以为匿名函数或变量指定任意名字
+		export default 3; //可以为任意的直接值
+		export default {name:'larry'，age:12}
+		export default function(){console.log('1')}
+
+
+	    2. 模块导入
+		模块引出　let name = 'larry'let age = 12;export {name,age};
+
+		模块导入　import v from path　（导入　的是一个具备所以由export导出的变量的　对象，所以这个对象可以通过解构实现导入）
+			１．path： 可以为一个路径或者一个模块名
+
+			２．v ：
+			    解构　
+				import {name,age,gender} from './module.js'  解构全部
+				import {name as a,age} from './module';　　　　　　解构部分
+			    变量名，导入的这个模块必须是export default;   因为default后面直接跟值，所有导入后可以由我们来起变量名
+				import sayHello from './module';
+				import a from './module';				
+				
+			    * as 变量   （as关键字用来重命名）
+				 import * as poly from 'babel-polyfill';
+				 import * as person from './module';  person对象(name,age属性)　　　可以使用person.name访问
+	    ３．模块import,export混合使用
+		在一个模块之中，先输入再输出同一个模块，可以使用import混合
+		export {bar,baz} from './module'
+		相当于　import {bar,baz} from './module';
+			export {bar,baz} from './module';
+
+(四)
+
+
+
+
+
+复习
+jquery(es6) + express(es6) + mysql
+
+babel
+webpack
+作业考试系统
+
+vue
+
+对象扩展
+    语法
+        {name,age,gender,sayName(){}}
+    API
+        Object.is
+        Object.assign(target,o1,o1)
+        Object.setPrototypeOf(obj,prototype);
+        Object.getPrototypeOf(obj)
+        Object.keys(obj);    
+        Object.values(obj);
+        Object.entries(obj);
+函数扩展
+    参数（形参　rest参数；实参　方法调用）
+    箭头函数    (形式参数)=>{方法体}
+数组扩展
+    扩展运算符
+    [...'hello']
+    [...new Set()]
+    API(Array)
+        Array.from()
+        Array.of()
+    API(Array.prototype)
+        arr.find((item,index,arr)=>{return boolean})
+        arr.findIndex((item,index,arr)=>{return boolean});
+        arr.fill(val,beiginIndex,endIndex)
+        arr.includes(val)
+        arr.keys()      
+        arr.values()
+        arr.entries()
+迭代器
+    Iterator
+        iter.next() 返回{value:,done:}
+    遍历迭代器或遍历具有迭代器接口的对象
+    for(let v of set){
+
+    }
+Set
+    无序不可以重复的集合
+    let set = new Set();
+    set.add()
+    set.delete()
+    set.clear()
+    set.has()
+    set.size
+Map
+    键值成对的集合（对象）
+    let map = new Map();//参数[[key,val],[key,val],[]]
+    map.set(key,val);
+    map.get(key);
+    map.has(key);
+    map.delete(key)
+    map.clear()
+    map.keys()
+    map.values()
+    map.entries()
+
+    var person = {}
+    var dog = {}
+
+添加题目
+        题目类型表          方向表
+           1001 单选        1001  webui
+           1002 多选        1002  java
+           1003 简答        1003  php
+        题目表 
+            id  name  type_id   depart_id
+            1   以下      1001    1001
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<!-- <script src="../dist/pajax.js"></script> -->
+	<!-- <script src="../dist/ajax.js"></script> -->
+	<script src="../dist/promise-ajax.js"></script>
+	<script>
+	/*2.未经过promise封装的，使用回调函数处理成功和失败的函数
+		getJSON('http://localhost:3000/student/findAll',function(data){
+			console.log(data);
+		},function(err){
+			console.log(err);
+		})
+	*/
+	/*３．使用的是用promise对象进行封装的，通过then 来实现成功和失败函数处理
+		var promise = getJSON('http://localhost:3000/student/findAll');
+		promise.then(function(data){
+			console.log(data);
+		},function(err){
+			console.log(err);
+		})
+	*/
+	/*
+		var promise = getJSON('http://localhost:3000/student/findAll');
+		promise.then(function(data){
+			console.log(data);
+			return data[0];
+		}).then(function(data1){
+			console.log(data1);
+		}).catch(function(err){
+			console.log(err);
+		})
+	*/
+	var promise1 =getJSON('http://localhost:3000/student/findAll');
+		
+	var promise2 = getJSON('http://localhost:3000/student/findById');
+		
+	var p = Promise.all([promise1,promise2]);
+	p.then(function(data){
+		console.log(data);//Array [ Array[12], Array[12] ]
+	}).catch(function(err){
+		console.log('has error');
+	});
+	
+
+	</script>
+</head>
+<body>
+	
+</body>
+</html>

@@ -1,0 +1,522 @@
+#day01
+	必须用单引号''
+
+1. what
+    mysql：关系型数据库
+
+    student         stucou              course
+    id  name age    id  sid  cid grade   id name credit 
+    1   terry 12    1   1     1   41      1  html
+    2   larry 13    2   1     2   88      2  css
+    3   tom   14    3   2     1   92      3  js
+
+    1   terry 12    1   1     1   41    1  html
+
+
+2. why
+    新致软件(newtouch)
+    前端          后台          数据库
+    vue         java            mysql(oracle)
+
+    axios.get('http://192.168.15.135:8080/getAllCourses.action').then((resp)=>{
+        resp.data
+    });
+
+    显示所有课程信息
+    编号  名称  学分  
+    1    java  4
+    2    js    4
+
+    
+3. how
+    0) 项目开发流程
+        1. 需求分析（原型axure）
+        2. 总体设计
+            数据建模
+                表
+                关系
+                    student
+                    course
+                    teacher
+                    classRoom
+                    ...
+            前端设计（ps）
+        3. 详细设计（平行开发）
+            前端
+                |
+                |交流接口(url,params,return)
+                |
+            后台java（node.js http mysql）
+                |
+                |
+            数据库(原始数据)
+
+mysql使用
+
+    1. 安装以及配置
+        $ apt-get install mysql-server-5.7
+        下载安装包 二进制（配置）
+        deb
+
+        /etc/my.cnf(mysql核心配置文件)
+        .bashrc/profile/.vimrc
+    
+    2. 启动mysql服务
+    	ubuntu中的service命令，用来lincx系统服务的开启和关闭等操作
+
+        	$ service mysql start 开启数据库服务
+        	$ service mysql stop 关闭数据库服务
+        	$ service mysql restart 重启数据库
+        	$ service mysql status 查看服务状态
+    
+    3. 连接Mysql数据库
+
+        1) 登录本地数据库
+            $ mysql -uroot -p
+            然后根据提示输入密码
+
+            或者mysql -uadmin -padmin
+
+        2) 远程登录
+            1.$ mysql -hhost -uroot -p  (-h后面接远程连接的主机IP地址，比如windows的主机地址)
+
+            2.远程登陆过程中会报错，windows的主机地址不被允许访问lincx数据库服务？解决方法：让root的允许只能被主机localhost访问改为所有都能访问。
+           		
+           		进入mysql表
+           			use mysql
+           		查看user表中所有的用户信息（user表是在mysql数据库中的系统表）
+            		mysql> select user,host from user;
+            
+           		在远程mysql数据库中更改user表root用户的信息
+					mysql> update user set host='%' where user = 'root';
+				重启数据库服务
+					$ sudo service mysql restart
+				重新连接
+					$ mysql -uroot --host192.168.15.135 –port3306 -p
+ 
+
+            3.mysql中有两个内置的数据库(系统的)
+            
+	            mysql
+	                user 用户信息
+	                （user,host）
+
+	            sys     系统信息
+
+            1. 查看当前dbms中所有数据库实例
+            	mysql> show databases;
+            
+            2. 选择一个数据库进行使用
+            	mysql> use 数据库实例名称
+            
+            3. 查看当前数据库实例中所有的表
+            	mysql> show tables;(必须用use命令先选择一个数据库实例)
+            
+            4. 查看user表中所有的用户信息（user表是在mysql数据库中的系统表）
+            	mysql> select user,host from user;
+            
+            5. 更改user表中root用户的host列 %
+            	mysql> update user set host='%' where user='root'
+        
+        3) 退出mysql
+            mysql> exit
+            mysql> quit
+            mysql> \q
+        
+        4) sql && mysql
+            sql(语言)
+                标准化查询语言
+                1. DDL（数据库定义语言）
+                    create
+                    alter
+                    drop
+                2. DML（数据库修改语言）
+                    查询语句
+                        select
+                    更新语句
+                        insert
+                        delete
+                        update
+            mysql/oracle/sqlserver
+                数据库管理系统，支持sql语言的，可以解析sql
+
+        5) 对数据库操作
+            mysql> create database 数据库名
+            mysql> drop database 数据库名
+            mysql> alter database 数据库名
+        
+        6) 对数据库表的操作
+            1.创建
+        	mysql> create table student(
+                id int(20) primary key,
+                name varchar(20),
+                gender char(1),
+                brith date
+            );
+        
+  
+            2. 插入
+                insert into 表名[(列)] values(值);
+
+                insert into student values(1,'terry','男','96-3-4');
+                insert into student(id,name) values(2,'larry');
+            
+            3. 查询
+                select 列名 from 表名 
+                select * from student;
+            4. 更改
+            	update user set host='%' where user='root'
+    
+    4. 用户管理
+        root用户
+        1) 创建用户
+            create user 用户名[@host] identified by 密码
+
+            mysql> create user 'admin'@'localhost' 
+                -> identified by 'admin'
+        2) 授权
+            grant 权限 on 数据库.表 to 用户
+            权限
+                all privileges
+                create/drop/alter
+                select/insert/delete/update
+
+            mysql> grant all privileges on web1702.* to 'admin'@'localhost'
+
+        3) 删除用户
+            drop user 用户名
+            `	mysql> drop user 'admin'@'localhost'
+        
+        4) 修改用户密码
+            alter user 用户名@localhost identified by 密码
+            
+            	mysql> alter user 'admin'@'localhost' 
+                -> identified by 'admin'
+        
+        作业：
+            1. 使用root命令本地登录
+            2. 创建admin用户
+            3. 为admin授权 all privileges
+            4. 退出root用户
+            5. 使用admin用户进行本地登录
+            6. 创建数据库 web1702
+            7. 直接在web1702中创建表
+                course(
+                    id int(20) primary key,
+                    name varchar(50),
+                    credit int(1)
+                )
+            8. 插入3条模拟数据
+            9. 创建customer用户，为customer授权 
+            select on web1702.course,测试customer能否删除数据
+            
+
+#day02
+	
+
+1.mysql 是数据库管理系统(一个系统软件)
+    dbms(数据库管理系统)
+        -> db（数据库）
+            -> table（表）
+                -> column（列）
+
+2.数据库的定义
+	1)创建数据库表
+
+	    create table table_name(
+	        column1 数据类型 [约束（列级约束）],
+	        column2 数据类型 [约束],
+	        ....,
+	        约束（表级约束）
+	    )编码设置;
+
+	    create table pk_student(
+	        id INT primary key ,
+	        name varchar(45) not null,
+	        gender char(1) ,
+	        birth date
+	    );
+	* 查看表结构
+		desc tableName;
+
+	* 约束条件：
+    	1)主键(码)primary key
+		    约束：
+		        唯一不可以重复
+		        不可以为空
+		    唯一确定一行记录的标识
+		    表
+		    学生表(主键,学号,姓名，性别，生日)
+		    
+		    2 1002 larry 男 1996
+		    3 1001 terry 男 1996
+		
+		2)外键
+    		约束：
+        		可以为空
+        		如果不为空，外键必须参照一个存在的主键
+
+
+    		在一张表中有一个键，但是不是主键，它指向另外一张表的主键
+
+		    手机表（主键,颜色,型号,owner）
+		    1 土豪金 iphone7   3
+		    2 土豪金 iphone7   
+
+
+		    丈夫
+		    1 terry 26
+		    2 larry 28
+		    3 tom   32
+		    4 jacky 22
+
+		    妻子       外键（一对多关系加了唯一性之后就变为等值或者一对一关系）
+		    1 vicky 22  1
+		    2 rose  21  4
+
+		    破电脑    内存(64位 8G(260))+固态（128G （400+30））
+		    thinkpad t470p  4G(8G) 固态    8k
+		    mac pro 8G(内存) 256(闪存)      9k
+		            16G
+		        air     6k
+		
+		3)唯一性约束 unique
+		4)非空约束 not null
+		5)默认值 default
+
+	* 数据类型
+		数字类型：
+			整数：TINYINT INT BIGINT MIDIUMINT
+			小数：
+				float	单精度，使用4个字节表示，float(m,d)
+				double	双精度，使用8个字节表示，double(m,d) m表示位数，d表示小数位数
+
+		字符类型：
+			char(n)	定长字符，n的取值为0~255，表示存储字符的最大数目
+			varchar(n)	变长字符，n的取值为0~255
+			blob	存放字节对象，比如视频，音频信息	
+			text	存放字符对象，比如大型文本信息。
+		日期类型
+			date :存放日期， 格式为：year-month-day，例如98-09-04
+				year如果为70-99表示1970-1999
+				year如果为00-69 表示2000-2069.
+			time :时间，格式为： hh:mm:ss，例如09:00:00
+			datetime :表示日期与事件，
+				格式为： year-month-day hh:mm:ss，  例如91-03-14 09:00:00 	
+
+
+
+	2)查询数据库表 select 
+	3)修改数据库表 update/alter
+	4)删除数据库表 delete/drop
+
+	5)创建表后要修改列使用alter
+		alter table 表名 add column 列名+数据类型+约束(列定义) 
+		alter table 表名 modify column 列名+数据类型+约束 
+		alter table 表名 drop column 列名; 
+		eg:
+			alter table student drop column gender; 
+			alter table student add column address varchar(25); 
+	6)清空表中所有数据
+		truncate
+
+
+3.表关系(通过外键实现的表关系)
+		一对多：外键维护在多的一方,外键命名(参照表_id)
+		一对一：外键维护在任意一方，一对多的特例（为外键添加唯一性约束）
+		多对多：外键维护在桥表中，两个一对多组成
+
+		外键数据类型和参照的主键数据类型必须一致
+
+
+	作业：
+	1. 完成《学生选课系统》ER图（staruml）
+	2. 依据ER图，使用workbench完成数据库表的创建
+	3. 模仿《猫眼电影票》绘制ER图
+	4. 依据ER图，使用workbench完成数据库表的创建
+	5. workbench安装在windows中，数据库服务用Ubuntu
+
+
+		电影票订票网站（猫眼） 数据建模:
+	    电影（电影名称，上映时间，价格，介绍，票房）
+
+	    电影院（电影院名称，地址，评价）
+
+	    影厅（影厅名称，座位数量）
+
+	    座位（坐标，状态）
+
+
+
+4.数据库的操作：在workbence中必须使用sql语句在终端写的一些命令（在现有的表中进行操作）
+	
+	1.插入：insert into 表名[列名1，列名2...] values(值1，值2);
+		insert into 表名[列名1，列名2...] values(null,'web1702');
+		//id不用写，因为是自增的，所以置为null
+
+	2.修改：update 表名 set 列名='',列名='' where ...;
+		update 表名 set 列名='java',credit=4 where id =1;
+
+	3.删除：delete from 表名 where子句;
+
+	4.查询：select 列1，列2 from 表名 
+
+	
+
+5.约束条件
+   	1)子句顺序：
+		select [列名等]
+		from 表名
+		where 子句
+		group by 分组依据
+		having 子句
+		order by 排序依据 排序规则
+	2)约束条件where和having:
+		where和having都是做限定条件进行筛选，where子句;但是where子句不能用于分组语句后，而having 是专门用于group by之后的
+		where子句不允许出现聚集函数，而having可以出现聚集函数。
+
+		聚集函数：
+			min()
+			max()
+			count()
+			avg()
+	3)连接查询 
+		join .. on  等值查询(  ==  ,  .. where)
+		left join .. on  左链接
+		right join .. on  右链接（优先显示右边的表格）
+
+	4)and和or关键字
+	5)between...and 什么到什么之间
+	6)like 模糊查询
+		name like 'j%'
+	7)group by 分组查询
+	8)order by 排序查询
+		asc 顺序（默认）
+		desc 倒序
+		order by name desc;
+
+
+*模拟数据
+
+1.开班
+	insert into xk_clazz values(null,'web1702');
+2.准备课程
+	insert into xk_course values(null,'lincx',2);
+3.学生报到
+	insert into xk_student values(null,'javky','男','95-3-1',1);
+4.学生选课
+	insert into xk_studentcourse values(null,80,1,1);
+5.
+	
+6.查询所有的男生的姓名
+	select name from xk_student where gender='男';
+7.查询学生表中有几种性别
+	distinct 关键字 (区分)
+	all 默认为all
+	select distinct gender from xk_student;
+8.查询课程名称以j开头的
+	like关键字 模糊查询
+	select * from xk_course where name like 'j%'; //name以j开头的  %表示任意
+9.查询出生日期在什么之间的所有学生
+	between... and
+	select * from xk_student where brith between '92-1-1' and '95-1-1';
+10.查询性别为男或出生日期在94年之后的学生
+	or
+	select * from xk_student where gender='男' or brith > '94-1-1';//小于94的
+11.查询性别为男并且出生日期在94年之后的学生
+	select * from xk_student where gender='男' and brith > '94-1-1';//小于94的
+
+12.查询出所有选修了课程学生的信息
+	select s.name,c.name,sc.grade
+	from xk_student as s,xk_course as c,xk_studentcourse as sc
+	where s.id=sc.student_id and c.id=sc.course_id;//等值连接
+13.查询出所有选修了lincx课程学生的信息
+	select s.name,c.name,sc.grade
+	from xk_student as s,xk_course as c,xk_studentcourse as sc
+	where s.id=sc.student_id and c.id=sc.course_id
+	having c.name = 'lincx';
+14.统计出选修了lincx学生 的数量
+	select count(*)
+	from xk_student as s,xk_course as c,xk_studentcourse as sc
+	where s.id=sc.student_id and c.id=sc.course_id
+	and c.name = 'lincx';
+15.查询出学生表中年龄最小的女生和男生
+	select max(brith),name,gender
+	from xk_student
+	group by gender,name;
+16.查询出所有学生按照年龄大小排序
+	select * from xk_student order by brith desc;//降序
+	select * from xk_student order by brith asc;//升序
+17.按照id降序排列,查询所有学生
+	select * from xk_student order by id desc;
+
+18.学生考试
+	*插入学生的成绩
+		update xk_studentcourse set grade =92
+		where student_id =1 
+		and course_id = 1;//知道学生的id和课程的id
+	//后面两种属于嵌套子查询语句
+		update xk_studentcourse set grade =92
+		where student_id =1 
+		and course_id = (select id from xk_course
+		where name ='js');//知道学生的id和不课程的id，但是知道课程名字
+
+		update xk_studentcourse set grade =92
+		where course_id =1 
+		and student_id = (select id from xk_student
+		where name ='javky');//不知道学生的id和知道课程的id，但是知道学生名字
+19.统计出选修了lincx课程的平均成绩
+	select avg(sc.grade)
+	from xk_studentcourse as sc,xk_course as c
+	where c.name ='lincx';
+
+	select avg(grade)
+	from xk_studentcourse
+	group by course_id
+	having course_id =(
+		select id from xk_course where name = 'lincx'
+	);
+
+	select avg(grade)
+	from xk_studentcourse
+	where course_id = (
+	select id from xk_course where name = 'lincx'
+	);
+
+19.查询出学生和班级之间的关系，并按照班级名称升序
+	select c.name,s.name
+	from xk_clazz as c,xk_student as s 
+    where c.id = s.clazz_id    //等值连接，必须从表的外键和主表的主键必须一致
+	order by c.name asc;
+	
+	-》转换为join连接查询
+	select c.name,s.name
+	from xk_clazz as c join xk_student as s
+    on c.id = s.clazz_id
+	order by c.name asc;
+
+20.查询出学生和班级之间的关系，并按照班级名称升序，并且把没有班级的学生也显示出来
+	select c.name,s.name
+	from xk_clazz as c right join xk_student as s
+    on c.id = s.clazz_id
+	order by c.name asc;
+
+	//优先把右边表格的信息显示出来
+21.查询出学生和班级之间的关系，并按照班级名称升序，并且显示出所有的班级信息
+	select c.name,s.name
+	from xk_clazz as c left join xk_student as s
+    on c.id = s.clazz_id
+	order by c.name asc;
+
+	//优先把左边表格的信息显示出来
+
+22.查询每个班级的学生总数
+	select c.name,count(s.name)
+	from xk_student s right join xk_clazz c
+	on s.clazz_id = c.id
+	group by c.name
+	order by c.name asc;
+
+
+文件导入到mysql
+mysql -uroot -proot -t < employees.sql;(这个操作应该要在保存employees.sql文件的父目录进行导入操作)

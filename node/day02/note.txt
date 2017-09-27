@@ -1,0 +1,164 @@
+1. Node
+    应用
+    1) 基本环境
+        vue
+    2) 服务端开发
+        http/express
+    3)　执行js脚本（后台）   
+2. 基本使用
+    安装（跨平台，linux,window...）
+    $ node --version
+    $ vim hello.js
+    $ node hello.js
+    $ node
+    > var str = "hello";
+    undefined
+    > str
+    hello
+3. 模块化机制
+    commonJS,每一个js文件或者目录都可以理解为是一个模块，模块之间可以相互调用
+    1) 单文件模块
+        module1.js
+            function sayHello(){
+
+            }
+            module.exports.sayHello = sayHello;
+
+    2) 目录模块
+        module2
+            必须有一个引导文件index.js
+                function sayHi(){
+
+                }
+                module.exports.sayHi = sayHi;
+    模块调用
+        var module1 = require('./module1.js');
+        加载过程
+            寻找module1.js
+                如果参数是路径，按照这个路径寻找
+                如果参数是模块名，到当前node_modules目录中寻找，如果找不到继续到上一级node_modules中寻找
+            运行module1.js
+            声明属性和方法都是私有的，其他模块不能访问
+            将module.exports返回
+４．内置模块（node 核心提供，使用之前无需安装（下载））
+    *path        路径 /home/WebUI/Node/day02/app.js
+    *querystring 查询字符串　
+        Key=val&key2=val2&key3=val3
+        =>两者之间的相互转化
+        {
+            key:val,
+            key2:val2,
+            key3:val3   
+        }
+    *url         统一资源定位符
+        http://localhost:8080/students/all
+        http://localhost:8080/students/findById?id=1001
+
+        require('url'); 
+
+    *http模块
+        用于开发服务器程序的模块
+        １.简单使用
+            1)引用http模块
+                var http =require('http');
+            2)创建服务
+                var server = http.createServer(function(req,resp){
+
+                });
+                createServer中有一个回调函数，该函数在每次接受用户请求的时候都会被调用。
+                该回调函数由两个参数，
+                 *request 是IncommingMessage的一个实例，用于保存请求数据，比如
+                    req.url     请求地址 /course?id=1&name=larry
+                    req.method  请求方式 //   GET/POST
+                    req.headers 请求头部详细信息
+
+                    事件
+                        data
+                            每个数据片段到来的时候都会激发该事件
+                        end
+                            所有的数据片段都接受到时候才激发该事件
+                        这两个事件配合起来用于接受post方式提交的数据
+                 
+                 *response是用来回应请求的对象
+                    resp.write('');
+                    resp.end();
+                    =>
+                    resp.end('');
+
+                    response.writeHead(statusCode[,reasonPhrase,][headers]);
+                        statusCode 用于指定一个三位的 HTTP 状态码 , 例如 404
+                        reasonPhrase 字符串，用于指定该状态码的描述信息
+                        headers 对象，用于指定服务器端创建的响应头对象
+
+            3)　获取用户请求地址(获取路由)
+                req.url // /courses?credit=3
+
+                url.parse(req.url).pathname;// /courses
+            4) 获取用户请求参数(get)
+                var query = url.parse(req.url).query;  // credit=3
+                //将查询字符转换为对象
+                querystring.parse(query);
+            5) 获取用户请求参数（post）
+                var chunk = new Buffer();
+                req.on('data',function(data){
+                    chunk += data;
+                }); 
+                req.on('end',function(){
+                    console.log(querystring.parse(chunk.toString()));
+                });
+            6)listen监听,每监听到一次请求，就会调用一次上面的回调函数
+                listen(8080,function(){
+                    consoel.log('端口号为8080的服务已经开启');
+                });
+
+５．第三方模块（由其他开发者提供的，使用之前先要进行安装）
+    第三方模块下载到当前目录的node_modules目录下。方便程序进行查找
+
+
+作业
+    要求编写服务提供如下几个接口
+    1．查询所有课程(get)
+        url     /courses
+        param   无
+        return  [{id,name,credit}]
+    2. 通过id查询课程(get)
+        url     /courses/queryById
+        param   id=1
+        return  {id,name,credit}
+    3. 通过id删除课程信息(get)
+        url     /courses/deleteById
+        param   id=1
+        return  {msg:'success'}/{msg:'error'}
+    4. 修改(post)
+        url     /courses/update
+        param   {id,name,credit}
+        return  {id,name,credit}
+    5. 保存(post)
+        url     /courses/save
+        param   {id,name,credit}
+        return  {msg:'success'}/{msg:'error'}
+
+    1．查询所有学生(get)
+        url     /students
+        param   无
+        return  [{id,name,gender,birth}]
+    2. 通过id查询课程(get)
+        url     /students/queryById
+        param   id=1
+        return  {id,name,gender,birth}
+    3. 通过id删除课程信息(get)
+        url     /students/deleteById
+        param   id=1
+        return  {msg:'success'}/{msg:'error'}
+    4. 修改(post)
+        url     /students/update
+        param   {id,name,gender,birth}
+        return  {id,name,gender,birth}
+    5. 保存(post)
+        url     /students/save
+        param   {id,name,gender,birth}
+        return  {msg:'success'}/{msg:'error'}
+
+
+express框架和http模块之间的关系
+express框架是已经封装好的http服务，就像是express是已经做好的家具，而http是木板。需要经过自己加工封装成家具。

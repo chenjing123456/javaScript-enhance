@@ -1,0 +1,58 @@
+*{
+	margin:0;
+	padding:0;
+}
+ul li{
+	list-style: none;
+}
+a{
+	text-decoration: none;
+	color: #000;
+}
+header,nav{
+	display: block;
+}
+header{
+	width: 100%;
+	background-color: pink;
+	overflow: hidden;
+}
+header .title{
+	width: 70%;
+	height: 80px;
+	float:left;
+}
+header .title span{
+	display: block;
+	width: 200px;
+	margin:0 auto;
+	font-size: 30px;
+	line-height: 80px;
+}
+header nav{
+	width: 20%;
+	float:right;
+}
+nav ul {
+	display: flex;
+}
+nav ul li{
+	margin-right: 10px;
+}
+.leftnav{
+	float:left;
+	width: 30%;
+	min-height: 300px;
+	border-right: 1px solid #ccc;
+}
+.leftnav ul{
+	width: 100%;
+	text-align: center;
+}
+.leftnav ul li a{
+	font-size: 24px;
+}
+.content{
+	float: right;
+	width:70%;
+}

@@ -1,0 +1,196 @@
+node 06视频看一下　跨域访问
+
+
+1. npm
+    1) 安装
+        node
+    2) 配置
+        npm install mysql
+        默认到官方的注册中心下载，下载速度慢
+        0. sudo chown -R $(whoami) $(npm cnofig get prefix)/{lib,share,bin}
+        1. 安装cnpm
+            npm install -g cnpm --registry=http://registry.npm.taobao.org
+
+            cnpm/npm config list    
+                查看配置信息
+        2. 本地注册中心
+            1) cnpm install sinopia -g
+            2) sinopia查看配置文件所在路径
+                ~/.config/sinopia/config.yaml
+            3) url:淘宝地址
+            4) sinopia
+            5) npm set registry=http://localhost:4873
+        3. npm使用
+            npm -> localhost -> registry.npm.taobao.org
+
+            1) npm init
+                package.json 模块的配置文件
+                name
+                version
+                main
+                dependencies
+                script:{
+                    "start":"node ./bin/www"
+                }
+
+                npm init -y
+            2) npm install
+                -g  全局安装
+                --save-dev/-D
+                    devDependencies
+                --no-save
+            3) npm update <package>
+            4) 删除模块
+                npm uninstall <package>
+                    1.从node_module中删除
+                    2.更新package.json文件
+                npm --no-save uninstall <package>
+                    只是从node_modules中删除
+            5) 发布
+                npm publish <package>
+                npm unpublish <package>@1.0.0
+    3) 安装方式
+        npm install -g <package>
+            将模块安装到系统目录中
+            能在命令行工具中使用
+
+        npm install <package>
+            将模块安装到当前目录下的node_modules中
+2. express
+    1) 安装
+        npm install express
+    2) 使用
+        var app = express();
+        var bodyParser = require('body-parser');
+        app.use(bodyParser.json());
+        app.use(bodyParser.urlencoded({extended:true}));
+
+        app.get('/',function(req,resp,next){
+            //get请求方式下参数的获取
+            req.query
+            //回应
+            resp.send("乱码");
+        })
+        app.post('/save',function(){
+            //post请求方式下参数的获取
+            req.body
+        })
+        app.listen(8080,function(){
+
+        });
+    3) 企业级开发
+        安装express脚手架
+        1. 安装（只要安装一次）
+            npm install express-generator -g
+        2. 使用脚手架创建项目
+            express　app2
+        3. 安装依赖启动项目
+            cd app2
+            npm install
+            npm run start
+
+
+
+
+
+##git
+
+首先进行git 安装 (apt-get git)
+
+***安装git之后，需要初始化用户名和密码
+		.gitconfig 配置文件用来设置git的用户名和邮箱，不设置commit不了
+		可执行下面两个命令进行配置：
+			git config --list 查看当前git账户名和邮箱等配置信息
+			git config --global user.email "126348556@qq.com"		
+			git config --global user.name "chenjing123456"
+
+
+###git本地仓库和远程仓库之间的操作（同一个用户）
+
+(1)本地仓库的操作
+	1.git init 初始化空仓库， 会在该文件夹下生成一个.git本地仓库
+	2.git add */某个文件   (放入git缓存)
+	  把当前文件夹的所有东西或者某个文件都放到git仓库的缓存stage里 。    
+	  可用git status 查看状态。 (see stage and branch)
+	  这时还不是一个git版本。
+	
+	3.git commit -m  'description'
+	 添加了一个git版本，可用
+		git log 查看日志（版本信息）
+		git reflog 查看所有的历史版本
+
+
+		
+
+	4.进行版本回退
+		配合git log/reflog 查看版本
+		git reset --hard 8cc56 回退到某个版本
+
+	5.branch分支
+		１．master主分支:默认有一个ＨＥＡＤ指针指向它；HEAD指针是会跟着版本移动的；每当提交一个版本时，指针都会跟着提交的版本移动
+			进行版本回退时指针也会跟着走，并且历史的版本都会一直在分支上，只有指针跟着相应的版本进行上下版本移动。
+		２．其他分支:如研发分支dev.
+			git branch 查看当前所有的分支,并且查看当前自己所在分支
+			git branch dev 创建dev分支，
+			git checkout dev 切换到分支dev
+			在当前分支进行一系列操作，并不会影响主分支；在主分支创建分支只是相当于进行了克隆操作，
+
+		３．把其他分支融合到主分支上；必须切换在主分支上进行操作
+			git　checkout master 切换到主分支
+			git merge dev/等其他分支　　合并分支
+
+			此时主分支的状态是连同其他分支的历史版本都有
+
+(2)远程仓库的操作
+	1．git remote add origin 远程地址   (把远程仓库跟本地仓库关联，关联后可以push和pull操作)
+		本地和远程都初始化一个仓库，然后把远程的仓库地址复制下来。进行上面的操作
+	2.git pull origin master 
+		把远程仓库的主分支拉下来，和主分支进行合并(合并操作是默认进行的)；
+		如果在上传之前远程仓库进行更新，则push不上去，所以需要pull一下
+	3.	git add * 
+		git commit -m ''
+	4.git push origin master   把本地仓库的主分支上传到远程仓库中
+
+
+
+
+
+###git多人协同操作（不同用户）
+	1.项目经理上传项目框架
+		在远程和本地进行仓库初始化
+		git remote add origin 远程地址　（本地和远程进行关联）
+		git pull origin master
+		git add *
+		git commit 		
+		git push origin master
+		
+	2.项目组成员下载项目框架
+		git clone 远程地址(克隆项目框架)
+	3.进行开发
+		
+	4.进行提交
+		
+
+		多人团队协作会出现以下问题
+			在你提交之前有人已经提交了，所以必须在每一次push之前进行一次pull下来进行更新
+			在提交之前你不知道对方修改了什么文件，你操作并commit之后；假设你们修改的是不同的文件，那么pull之后就可以进行push。
+				；但是如果你和别人操作了同一份文件时，就会产生冲突，所以在push之前你需要先解决冲突
+
+			
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

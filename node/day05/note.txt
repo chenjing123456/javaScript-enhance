@@ -1,0 +1,292 @@
+1. npm
+    1) 安装
+        node自带
+    2) 配置
+        npm install mysql
+        默认到官方的注册中心下载，下载速度慢
+        
+	0. sudo chown -R $(whoami) $(npm cnofig get prefix)/{lib,share,bin}
+        1. 安装cnpm
+            npm install -g cnpm --registry=http://registry.npm.taobao.org
+
+            cnpm/npm config list    
+                查看配置信息
+        2. 本地注册中心
+            1) cnpm install sinopia -g
+            2) sinopia查看配置文件所在路径
+                ~/.config/sinopia/config.yaml
+            3) 修改配置文件　url:淘宝注册中心
+            4) sinopia　启动
+            5) npm set registry=http://localhost:4873　修改npm默认的注册中心地址变为本地仓库
+        3. npm使用(自定义一个模块)
+            npm -> localhost -> registry.npm.taobao.org
+
+            1) npm init　
+                package.json 模块的配置文件
+                name
+                version
+                main
+                dependencies
+                script:{
+                    "start":"node ./bin/www"
+                }
+
+                npm init -y　全部默认
+            2) npm install
+                -g  全局安装
+                --save-dev/-D
+                    配置文件多一个devDependencies属性	　开发环境依赖
+                --no-save  只安装模块到node_modules 但是不会写在package.json 的dependecies中
+
+            3) npm update <package>
+            4) 删除模块
+                npm uninstall <package>
+                    1.从node_module中删除
+                    2.更新package.json文件
+                
+		npm --no-save uninstall <package>
+                  **  只从node_modules删除，但是不会修改packsge.json 中的依赖信息
+            5) 发布
+                npm publish <package>　　　发布模块
+                npm unpublish <package>@1.0.0（取消发布的模块）
+    3) 安装方式
+        npm install -g <package>
+            将模块安装到系统目录中
+            能在命令行工具中使用
+
+        npm install <package>
+            将模块安装到当前目录下的node_modules中
+2. express（第三方模块）
+    1) 安装
+        npm install express
+    2) 使用
+	*定义单个路由
+		var app = express();
+		var bodyParser = require('body-parser');
+		app.use(bodyParser.json());
+		app.use(bodyParser.urlencoded({extended:true}));
+
+		app.get('/',function(req,resp,next){
+		    //get请求方式下参数的获取　express自带的中间件,
+		    req.query
+		    //回应
+		    resp.send("解决乱码问题");
+		})
+		app.post('/save',function(){
+		    //post请求方式下参数的获取，需要借助第三方中间件(需安装)
+		    req.body
+		})
+		app.listen(8080,function(){
+
+		});
+	*定义路由中间件（express内置的中间件，可以直接创建，不用安装）
+		１．直接写在app.js页面
+			var express = require('express');
+
+			var app = express();
+
+			var studentRouter = express.Router();
+
+			studentRouter.get('/findAll',function(req,resp){
+				resp.send('search all students');
+			})
+			studentRouter.post('/login',function(req,resp){
+				resp.send('login in success');
+			})
+
+			app.use('/student',studentRouter);
+
+			app.listen(8080,function(){
+				console.log('port 8080 server had been start');
+			})
+		２．把中间件分离出来写在routers文件夹下 的各自子路由js文件
+		
+		*子路由文件
+
+		var express = require('express');
+
+		var studentRouter = express.Router();
+
+		studentRouter.get('/findAll',function(req,res){
+			res.send('search all studnets messages');
+		});
+		studentRouter.post('/login',function(req,res){
+			res.send('login in success');
+		});
+
+		module.exports = studentRouter;//middle application is got by module.exports
+		
+		*index.js文件中
+
+		var express = require('express');
+
+		var app = express();
+		var studentRouter = require('./router/studentRouter');//get module.exports,really it is middle application
+		
+		/*把这些提取出来放到子路由文件中
+		var studentRouter = express.Router();
+
+		studentRouter.get('/findAll',function(req,resp){
+			resp.send('search all students');
+		});
+		studentRouter.post('/login',function(req,resp){
+			resp.send('login in success');
+		});
+		*/
+	
+		app.use('/student',studentRouter);
+
+		app.listen(8080,function(){
+			console.log('port 8080 server had been start');
+		});
+    3) 企业级开发
+        安装express脚手架
+        1. 安装（只要安装一次）
+            npm install express-generator -g
+        2. 使用脚手架创建项目
+            express　app2（项目名）
+        3. 安装依赖启动项目　
+            cd app2　进入
+
+            npm install　安装依赖
+　
+            npm run start　启动项目（端口默认是３０００）
+	4.静态托管
+		用express中内置的express.static('目录名');方式实现静态文件托管，默认托管到public文件夹中
+		在public文件夹中的静态资源是属于本地服务器的资源，需要从本地读取并且写入到resp.write()中
+		app.use(express.static(path.join(__dirname, 'public')));
+		
+		例如在public新建一个index.html;在浏览器访问该静态资源http://localhost:3000/index.html
+
+		<form action="student/login" method="post"> 
+ //静态资源的action是由子路由中的地址决定的 
+子路由中定义login静态资源的地址是　/student/login
+而在访问时http://localhost:3000/　login.html 当前login.html的根目录/　拼接上　student/login,　那么就能拼出 /student/login子路由中的路径，就可以把静态资源的东西提交到子路由中，并返回响应。
+		
+			name <input type="text" name="name"><br>
+			password <input type="password" name="pwd" id=""><br>
+			<input type="submit">
+		</form>
+	5.路由
+		根路由
+  		  app.js:			
+			app.use('/', index);        /
+			app.use('/users', users);   /users
+		子路由
+		  router/index.js
+			var router = express.Router();
+			router.get('/', function(req, res, next) {
+			  res.render('index', { title: 'Express' });
+			});                /  根目录/
+			
+                  router.users.js
+			router.get('/', function(req, res, next) {
+			  res.send('respond with a resource');
+			});                /  根目录/usrs
+        		子路由中/表示根目录，也就是在app.js中定义的根目录
+
+
+AjAX
+
+1.Asynchronous JavaScript + XML, 不是一个新技术，而是多个技术的一个组合，使用 ajax 可以更方便更快捷的进行页面的局部更新。
+ Ajax 使用XMLHttpRequest 对象与服务器进行交互，它能够发送和接受多种形式的数据格式（例如 json,xml,html,text ）。
+ 所谓异步即不需要更新整个页面就可以与服务器交换数据，更新局部页面。
+
+2.
+	获取 XMLHttpRequest 对象
+		var httpRequest = new XMLHttpRequest();
+	
+	 发送请求
+		httpRequest.setRequestHeader('Content-Type', 'application/x-www-formurlencoded');//请求头必须要写（规定发送什么格式的数据与数据库交互）
+		httpRequest.open('GET', 'http://www.example.org/some.file', true);　　连接后台服务器
+		httpRequest.send(data);　　　　发送请求
+	
+	 监听就绪状态的改变
+		httpRequest.onreadystatechange = function(){
+		// Process the server response here
+			if(httpRequest.readyState == 4){
+				if(httpRequest.status == 200){
+					httpRequest.responseText//后台返回的数据				
+				}			
+			}
+		};
+		
+		*从后台获取的参数
+		 httpRequest.responseText 返回字符串信息
+		 httpRequest.responseXML 返回 xml 对象信息
+
+３．readyState 就绪状态码
+	 0 (uninitialized) or (request not initialized)
+	 1 (loading) or (server connection established)
+	 2 (loaded) or (request received)
+	 3 (interactive) or (processing request)
+	 4 (complete) or (request finished and response is ready)
+４．status　状态码
+	200
+	404
+	500
+5.发送表单编码的请求:
+	*当用户提交表单时，表单中的数据（每个表单元素的名字和值）编码到一个字符串中并随请求发送。
+	*对表单数据的编码方案：对每个表单元素的名字和值执行普通的 URL编码（使用十六进制转义码替换特殊字符），使用等号把编码后的名字和值分开，并使用“ &” 符号分开键 / 值对。
+	*表单数据编码格式有一个正式的MIME 类型application/x-www-form-urlencoded ，当使用 POST 方式提交这种顺序的表单时，必须设置 "Content-Type" 请求头为 "application/x-www-form-urlencoded”
+	封装的表单编码方式的方法，把要发送的数据作为这个函数的参数，就可把发送数据变成表单编码的数据
+	function encodeFormData(data){
+	if(!data){return “”;} var pairs = [];
+	for(var name in data){ if(!data.hasOwnProperty(name) ||
+	typeof data[name] == "function"){continue;}
+	var value = data[name].toString();
+	name = encodeURIComponent(name).replace("%20","+");// 编码
+	value = encodeURIComponent(value).replace("%20","+");// 编码
+	pairs.push(name+"="+value);
+	}
+	return pairs.join('&');
+	}
+
+６．  发送 json 格式的请求 
+	当使用 POST 方式提交 json 格式数据的表单时，必须设置 "Content-Type" 请求头为 " application/json”
+	把要发送的数据作为参数传递给该函数的data参数，即可变成json数据格式。
+		function postJSON(url,data,callback){
+		var request = new XMLHttpRequest();
+		request.open(“POST”,url);
+		reqeust.onreadystatechange = function(){
+		 if(request.readyState === 4 && callback){
+		callback(request);
+		 }
+		};
+		request.setRequestHeader("Content-Type","application/json");
+		request.send(JSON.stringify(data));
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
